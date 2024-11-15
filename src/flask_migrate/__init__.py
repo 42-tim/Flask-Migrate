@@ -104,18 +104,6 @@ class Migrate(object):
         return self.call_configure_callbacks(config)
 
 
-def catch_errors(f):
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        try:
-            f(*args, **kwargs)
-        except (CommandError, RuntimeError) as exc:
-            log.error('Error: ' + str(exc))
-            sys.exit(1)
-    return wrapped
-
-
-@catch_errors
 def list_templates():
     """List available templates."""
     config = Config()
@@ -128,7 +116,6 @@ def list_templates():
         config.print_stdout("%s - %s", tempname, synopsis)
 
 
-@catch_errors
 def init(directory=None, multidb=False, template=None, package=False):
     """Creates a new migration repository"""
     if directory is None:
@@ -148,7 +135,6 @@ def init(directory=None, multidb=False, template=None, package=False):
     command.init(config, directory, template=template, package=package)
 
 
-@catch_errors
 def revision(directory=None, message=None, autogenerate=False, sql=False,
              head='head', splice=False, branch_label=None, version_path=None,
              rev_id=None):
@@ -161,7 +147,6 @@ def revision(directory=None, message=None, autogenerate=False, sql=False,
                      version_path=version_path, rev_id=rev_id)
 
 
-@catch_errors
 def migrate(directory=None, message=None, sql=False, head='head', splice=False,
             branch_label=None, version_path=None, rev_id=None, x_arg=None):
     """Alias for 'revision --autogenerate'"""
@@ -172,7 +157,6 @@ def migrate(directory=None, message=None, sql=False, head='head', splice=False,
                      version_path=version_path, rev_id=rev_id)
 
 
-@catch_errors
 def edit(directory=None, revision='current'):
     """Edit current revision."""
     if alembic_version >= (0, 8, 0):
@@ -183,7 +167,6 @@ def edit(directory=None, revision='current'):
         raise RuntimeError('Alembic 0.8.0 or greater is required')
 
 
-@catch_errors
 def merge(directory=None, revisions='', message=None, branch_label=None,
           rev_id=None):
     """Merge two revisions together.  Creates a new migration file"""
@@ -192,7 +175,6 @@ def merge(directory=None, revisions='', message=None, branch_label=None,
                   branch_label=branch_label, rev_id=rev_id)
 
 
-@catch_errors
 def upgrade(directory=None, revision='head', sql=False, tag=None, x_arg=None):
     """Upgrade to a later version"""
     config = current_app.extensions['migrate'].migrate.get_config(directory,
@@ -200,7 +182,6 @@ def upgrade(directory=None, revision='head', sql=False, tag=None, x_arg=None):
     command.upgrade(config, revision, sql=sql, tag=tag)
 
 
-@catch_errors
 def downgrade(directory=None, revision='-1', sql=False, tag=None, x_arg=None):
     """Revert to a previous version"""
     config = current_app.extensions['migrate'].migrate.get_config(directory,
@@ -210,14 +191,12 @@ def downgrade(directory=None, revision='-1', sql=False, tag=None, x_arg=None):
     command.downgrade(config, revision, sql=sql, tag=tag)
 
 
-@catch_errors
 def show(directory=None, revision='head'):
     """Show the revision denoted by the given symbol."""
     config = current_app.extensions['migrate'].migrate.get_config(directory)
     command.show(config, revision)
 
 
-@catch_errors
 def history(directory=None, rev_range=None, verbose=False,
             indicate_current=False):
     """List changeset scripts in chronological order."""
@@ -229,7 +208,6 @@ def history(directory=None, rev_range=None, verbose=False,
         command.history(config, rev_range, verbose=verbose)
 
 
-@catch_errors
 def heads(directory=None, verbose=False, resolve_dependencies=False):
     """Show current available heads in the script directory"""
     config = current_app.extensions['migrate'].migrate.get_config(directory)
@@ -237,21 +215,18 @@ def heads(directory=None, verbose=False, resolve_dependencies=False):
                   resolve_dependencies=resolve_dependencies)
 
 
-@catch_errors
 def branches(directory=None, verbose=False):
     """Show current branch points"""
     config = current_app.extensions['migrate'].migrate.get_config(directory)
     command.branches(config, verbose=verbose)
 
 
-@catch_errors
 def current(directory=None, verbose=False):
     """Display the current revision for each database."""
     config = current_app.extensions['migrate'].migrate.get_config(directory)
     command.current(config, verbose=verbose)
 
 
-@catch_errors
 def stamp(directory=None, revision='head', sql=False, tag=None, purge=False):
     """'stamp' the revision table with the given revision; don't run any
     migrations"""
@@ -259,7 +234,6 @@ def stamp(directory=None, revision='head', sql=False, tag=None, purge=False):
     command.stamp(config, revision, sql=sql, tag=tag, purge=purge)
 
 
-@catch_errors
 def check(directory=None):
     """Check if there are any new operations to migrate"""
     config = current_app.extensions['migrate'].migrate.get_config(directory)
